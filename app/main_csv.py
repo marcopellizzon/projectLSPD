@@ -9,5 +9,6 @@ with open('employees.csv', 'r') as file:
     for row in csv_reader:
         print(row)
         print ("ciao matthias sono marco")
+        print("esempio2")
 
 print("ended")
