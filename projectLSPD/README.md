@@ -1,2 +1,0 @@
-# projectLSPD
-ciao bello
