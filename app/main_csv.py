@@ -8,5 +8,6 @@ with open('employees.csv', 'r') as file:
     # Step 4: Read and process the data
     for row in csv_reader:
         print(row)
+        print ("ciao matthias sono marco")
 
 print("ended")
