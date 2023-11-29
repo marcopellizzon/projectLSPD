@@ -1,7 +1,17 @@
 version: '3'
 services:
-  csv:
+  frontend:
     build:
-      context: .
+      context: ./frontend
+    ports:
+      - "8080:80"
     volumes:
-      - ./app/:/app
+      - ./frontend:/app
+
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "8081:80"
+    volumes:
+      - ./backend:/app
