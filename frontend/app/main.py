@@ -4,7 +4,7 @@ Frontend module for the Flask application.
 This module defines a simple Flask application that serves as the frontend for the project.
 """
 
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 import requests  # Import the requests library to make HTTP requests
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
@@ -16,11 +16,12 @@ app.config['SECRET_KEY'] = 'your_secret_key'  # Replace with a secure secret key
 FASTAPI_BACKEND_HOST = 'http://backend'  # Replace with the actual URL of your FastAPI backend
 BACKEND_URL = f'{FASTAPI_BACKEND_HOST}/query/'
 
-
 class QueryForm(FlaskForm):
     person_name = StringField('Person Name:')
     submit = SubmitField('Get Birthday from FastAPI Backend')
 
+    comune_name = StringField('Comune Name:')
+    submit1 = SubmitField('Get Comune from FastAPI Backend')
 
 @app.route('/')
 def index():
@@ -78,6 +79,45 @@ def internal():
             error_message = f'Error: Unable to fetch birthday for {person_name} from FastAPI Backend'
 
     return render_template('internal.html', form=form, result=None, error_message=error_message)
+
+#//////////////
+
+
+
+
+@app.route('/internal1', methods=['GET', 'POST'])
+def internal1():
+    form = QueryForm()
+    
+    error_message = None  # Initialize error message
+
+    if form.validate_on_submit():
+        comune_name = form.comune.data
+
+        # Make a GET request to the FastAPI backend with the comune name
+        fastapi_url = f'{FASTAPI_BACKEND_HOST}/query_waste/{comune_name}'
+        try:
+            response = requests.get(fastapi_url)
+            response.raise_for_status()  # Raise an HTTPError for bad responses (4xx and 5xx)
+
+            # Extract and display the result from the FastAPI backend
+            data = response.json()
+            waste_amount = data.get('waste_amount', f'Error: Waste amount not available for {comune_name}')
+            return render_template('internal.html', form=form, waste_amount=waste_amount, error_message=error_message)
+
+        except requests.exceptions.HTTPError as errh:
+            error_message = f"HTTP Error: {errh}"
+
+        except requests.exceptions.RequestException as err:
+            error_message = f"Error: {err}"
+
+    return render_template('internal.html', form=form, waste_amount=None, error_message=error_message)
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+
+
 
 
 if __name__ == '__main__':
